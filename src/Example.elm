@@ -1,5 +1,6 @@
 module Example exposing (view)
 
+import Dict
 import Elm.AST.Frontend as Frontend
 import Elm.AST.Frontend.Unwrapped as FE
 import Elm.Compiler
@@ -40,20 +41,25 @@ meExpr ast =
                 |> SimpleValue
 
         _ ->
-            "cannot interpret"
-                |> VError
-                |> SimpleValue
+            exprError ast
+
+
+exprError ast =
+    let
+        _ =
+            Debug.log "unsupported ast" ast
+    in
+    "cannot interpret"
+        |> VError
+        |> SimpleValue
 
 
 text s =
     Html.div [ style "padding" "20px" ] [ Html.text s ]
 
 
-view =
+runExample code =
     let
-        code =
-            "(100 + 60 + 2) :: [5, 7+2]"
-
         astResult =
             code
                 |> Elm.Compiler.parseExpr
@@ -93,5 +99,13 @@ view =
     , text elmInElmSide
     , text metaElmSide
     , text (Debug.toString computedExpr)
+    , Html.hr [] []
     ]
+
+
+view =
+    [ "(100 + 60 + 2) :: [5, 7+2]"
+    ]
+        |> List.map runExample
+        |> List.concat
         |> Html.div []
