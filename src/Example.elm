@@ -19,6 +19,17 @@ import MeType
 
 meExpr ast =
     case ast of
+        FE.Call rec ->
+            F1
+                (meExpr rec.fn)
+                (meExpr rec.argument)
+
+        FE.Argument name ->
+            VarName name
+
+        FE.Lambda rec ->
+            meExpr rec.body
+
         FE.List items ->
             -- note there's a bug in meta-elm where I don't
             -- compute lists aggressively enough, so we do
@@ -33,7 +44,15 @@ meExpr ast =
             Infix (meExpr a) MeList.cons (meExpr b)
 
         FE.Plus a b ->
-            Infix (meExpr a) MeNumber.plus (meExpr b)
+            case ( a, b ) of
+                ( FE.Argument name, _ ) ->
+                    LambdaLeft name MeNumber.plus (meExpr b)
+
+                ( _, FE.Argument name ) ->
+                    LambdaRight (meExpr a) MeNumber.plus name
+
+                _ ->
+                    Infix (meExpr a) MeNumber.plus (meExpr b)
 
         FE.Int n ->
             n
@@ -82,8 +101,6 @@ runExample code =
 
         result =
             computedExpr
-                |> MeRunTime.getFinalValue
-                |> ComputedValue
                 |> MeRepr.fromExpr
 
         elmInElmSide =
@@ -105,6 +122,8 @@ runExample code =
 
 view =
     [ "(100 + 60 + 2) :: [5, 7+2]"
+    , "(\\x -> x + 1)(7)"
+    , "(\\z -> 2 + z)(40)"
     ]
         |> List.map runExample
         |> List.concat
