@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Example
 
 
 type alias Model =
@@ -60,10 +61,6 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    let
-        _ =
-            Debug.log "hello" "hello"
-    in
     { title = model.title
-    , body = []
+    , body = [ Example.view ]
     }
