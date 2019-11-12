@@ -17,8 +17,30 @@ import MeType
         )
 
 
+getBuiltin var =
+    let
+        module_ =
+            var.module_
+                |> Maybe.withDefault "<unknown>"
+
+        builtins =
+            [ ( "List.map", MeList.map )
+            ]
+                |> Dict.fromList
+    in
+    Dict.get (module_ ++ "." ++ var.name) builtins
+
+
 meExpr ast =
     case ast of
+        FE.Var rec ->
+            case getBuiltin rec of
+                Just expr ->
+                    expr
+
+                _ ->
+                    exprError ast
+
         FE.Call rec ->
             F1
                 (meExpr rec.fn)
@@ -121,7 +143,8 @@ runExample code =
 
 
 view =
-    [ "(100 + 60 + 2) :: [5, 7+2]"
+    [ "17 :: (List.map (\\x -> x + 2) [ 10, 20, 30 ])"
+    , "(100 + 60 + 2) :: [5, 7+2]"
     , "(\\x -> x + 1)(7)"
     , "(\\z -> 2 + z)(40)"
     ]
