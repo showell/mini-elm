@@ -10,6 +10,7 @@ import MeList
 import MeNumber
 import MeRepr
 import MeRunTime
+import MeTuple
 import MeType
     exposing
         ( Expr(..)
@@ -17,16 +18,22 @@ import MeType
         )
 
 
+builtins =
+    [ ( "List.map", MeList.map )
+    , ( "List.sortBy", MeList.sortByInt ) -- cheating a bit!!!
+    , ( "Tuple.first", MeTuple.first )
+    , ( "Tuple.pair", MeTuple.pair )
+    , ( "Tuple.second", MeTuple.second )
+    , ( "List.indexedMap", MeList.indexedMap )
+    ]
+        |> Dict.fromList
+
+
 getBuiltin var =
     let
         module_ =
             var.module_
                 |> Maybe.withDefault "<unknown>"
-
-        builtins =
-            [ ( "List.map", MeList.map )
-            ]
-                |> Dict.fromList
     in
     Dict.get (module_ ++ "." ++ var.name) builtins
 
@@ -95,10 +102,6 @@ exprError ast =
         |> SimpleValue
 
 
-text s =
-    Html.div [ style "padding" "20px" ] [ Html.text s ]
-
-
 runExample code =
     let
         astResult =
@@ -132,7 +135,7 @@ runExample code =
             Debug.toString expr
 
         demoText =
-            code ++ " gets intrepreted as " ++ result
+            code ++ "\n = \n\n" ++ result
     in
     [ text demoText
     , text elmInElmSide
@@ -142,11 +145,45 @@ runExample code =
     ]
 
 
+toCall : String -> String
+toCall s =
+    let
+        apply f v =
+            "(" ++ f ++ ")(\n" ++ v ++ ")"
+
+        makeCalls lst =
+            case lst of
+                [] ->
+                    "empty pipe expression"
+
+                h :: rest ->
+                    List.foldl apply h rest
+    in
+    s
+        |> String.split "|>"
+        |> List.map String.trim
+        |> makeCalls
+
+
+text s =
+    Html.div [ style "padding" "5px" ] [ Html.pre [] [ Html.text s ] ]
+
+
 view =
     [ "17 :: (List.map (\\x -> x + 2) [ 10, 20, 30 ])"
     , "(100 + 60 + 2) :: [5, 7+2]"
     , "(\\x -> x + 1)(7)"
     , "(\\z -> 2 + z)(40)"
+    , toCall """
+            [ 41, 17, 22, 35, 500 + 7 ]
+                |> List.indexedMap Tuple.pair
+                |> List.sortBy Tuple.second
+                |> List.map Tuple.first
+                |> List.indexedMap Tuple.pair
+                |> List.sortBy Tuple.second
+                |> List.map Tuple.first
+                |> List.map (\\n -> n + 1)
+                """
     ]
         |> List.map runExample
         |> List.concat
