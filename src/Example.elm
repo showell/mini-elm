@@ -42,7 +42,7 @@ meExpr ast =
                     exprError ast
 
         FE.Call rec ->
-            F1
+            A1
                 (meExpr rec.fn)
                 (meExpr rec.argument)
 
