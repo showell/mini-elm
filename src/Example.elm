@@ -178,8 +178,14 @@ text s =
     Html.div [ style "padding" "5px" ] [ Html.pre [] [ Html.text s ] ]
 
 
-view : Html msg
+view : List (Html msg)
 view =
+    [ viewExample
+    ]
+
+
+viewExample : Html msg
+viewExample =
     [ "17 :: (List.map (\\x -> x + 2) [ 10, 20, 30 ])"
     , "(100 + 60 + 2) :: [5, 7+2]"
     , "(\\x -> x + 1)(7)"

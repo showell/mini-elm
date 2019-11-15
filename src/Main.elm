@@ -58,5 +58,5 @@ subscriptions _ =
 view : Model -> Browser.Document Msg
 view model =
     { title = model.title
-    , body = [ Example.view ]
+    , body = Example.view
     }
