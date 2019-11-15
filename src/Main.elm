@@ -2,15 +2,11 @@ module Main exposing (main)
 
 import Browser
 import Example
-
-
-type alias Model =
-    { title : String
-    }
-
-
-type Msg
-    = Never
+import Type
+    exposing
+        ( Model
+        , Msg
+        )
 
 
 
