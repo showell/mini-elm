@@ -19,7 +19,9 @@ import MeWrapper
 
 
 type alias VarInfo =
-    { module_ : Maybe String, name : String }
+    { module_ : Maybe String
+    , name : String
+    }
 
 
 getBuiltin : VarInfo -> Maybe Expr
@@ -148,6 +150,8 @@ runExample code =
     ]
 
 
+
+{--
 toCall : String -> String
 toCall s =
     let
@@ -166,6 +170,7 @@ toCall s =
         |> String.split "|>"
         |> List.map String.trim
         |> makeCalls
+--}
 
 
 text : String -> Html msg
