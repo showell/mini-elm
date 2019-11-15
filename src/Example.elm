@@ -4,8 +4,9 @@ import Dict
 import Elm.AST.Frontend as Frontend
 import Elm.AST.Frontend.Unwrapped as FE
 import Elm.Compiler
-import Html exposing (Html)
+import Html exposing (Html, div)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick, onInput)
 import MeList
 import MeNumber
 import MeRepr
@@ -16,6 +17,7 @@ import MeType
         , V(..)
         )
 import MeWrapper
+import Type exposing (Model, Msg(..))
 
 
 type alias VarInfo =
@@ -178,13 +180,70 @@ text s =
     Html.div [ style "padding" "5px" ] [ Html.pre [] [ Html.text s ] ]
 
 
-view : List (Html msg)
-view =
-    [ viewExample
+evaluate : String -> String
+evaluate code =
+    let
+        astResult =
+            code
+                |> Elm.Compiler.parseExpr
+                |> Result.map Frontend.unwrap
+
+        expr =
+            case astResult of
+                Ok ast ->
+                    ast
+                        |> meExpr
+
+                Err _ ->
+                    "cannot compile"
+                        |> VError
+                        |> ComputedValue
+
+        computedExpr =
+            expr
+                |> MeRunTime.computeExpr
+    in
+    computedExpr
+        |> MeRepr.fromExpr
+
+
+divify : Html Msg -> Html Msg
+divify html =
+    html |> List.singleton |> div [ style "padding" "5px" ]
+
+
+viewRepl : Model -> Html Msg
+viewRepl model =
+    let
+        textAreaAttrs =
+            [ style "width" "350px"
+            , style "height" "150px"
+            , onInput UpdateInputCode
+            ]
+
+        inputArea =
+            [ Html.textarea textAreaAttrs [ Html.text model.inputCode ]
+            , Html.button [ onClick Compile ] [ Html.text "compile" ] |> divify
+            , Html.text (evaluate model.code) |> divify
+            ]
+                |> div [ style "padding" "50px" ]
+    in
+    inputArea
+
+
+view : Model -> List (Html Msg)
+view model =
+    [ viewRepl model
+    , Html.hr [] []
+    , Html.h3 [] [ Html.text "supported methods" ]
+    , MeWrapper.viewWrappers |> div []
+    , Html.hr [] []
+    , Html.text "ignore everything below:"
+    , viewExample
     ]
 
 
-viewExample : Html msg
+viewExample : Html Msg
 viewExample =
     [ "17 :: (List.map (\\x -> x + 2) [ 10, 20, 30 ])"
     , "(100 + 60 + 2) :: [5, 7+2]"

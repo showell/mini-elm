@@ -5,7 +5,7 @@ import Example
 import Type
     exposing
         ( Model
-        , Msg
+        , Msg(..)
         )
 
 
@@ -26,8 +26,13 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
+        code =
+            "List.map (\\x -> x + 3) (5 :: [(\\x -> x + 1)(8)])"
+
         model =
             { title = "simple demo"
+            , code = code
+            , inputCode = code
             }
     in
     ( model, Cmd.none )
@@ -38,8 +43,13 @@ init _ =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update _ model =
-    ( model, Cmd.none )
+update msg model =
+    case msg of
+        Compile ->
+            ( { model | code = model.inputCode }, Cmd.none )
+
+        UpdateInputCode inputCode ->
+            ( { model | inputCode = inputCode }, Cmd.none )
 
 
 
@@ -58,5 +68,5 @@ subscriptions _ =
 view : Model -> Browser.Document Msg
 view model =
     { title = model.title
-    , body = Example.view
+    , body = Example.view model
     }
