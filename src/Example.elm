@@ -221,8 +221,20 @@ viewRepl model =
             , onInput UpdateInputCode
             ]
 
+        introText =
+            """
+            This is powered by elm-in-elm (parsing) and meta-elm (evaluation).
+            The supported operators are "+" and "::" for now.  The supported data
+            types are lists and integers.  You must use normal
+            calling syntax (e.g. no "|>" or similar things).
+            """
+                |> Html.text
+                |> List.singleton
+                |> Html.p [ style "width" "350px" ]
+
         inputArea =
-            [ Html.textarea textAreaAttrs [ Html.text model.inputCode ]
+            [ introText
+            , Html.textarea textAreaAttrs [ Html.text model.inputCode ]
             , Html.button [ onClick Compile ] [ Html.text "compile" ] |> divify
             , Html.text (evaluate model.code) |> divify
             ]
