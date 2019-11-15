@@ -16,17 +16,11 @@ import MeType
         ( Expr(..)
         , V(..)
         )
+import MeWrapper
 
 
 builtins =
-    [ ( "List.map", MeList.map )
-    , ( "List.sortBy", MeList.sortByInt ) -- cheating a bit!!!
-    , ( "Tuple.first", MeTuple.first )
-    , ( "Tuple.pair", MeTuple.pair )
-    , ( "Tuple.second", MeTuple.second )
-    , ( "List.indexedMap", MeList.indexedMap )
-    ]
-        |> Dict.fromList
+    MeWrapper.allWrappers
 
 
 getBuiltin var =
@@ -57,7 +51,21 @@ meExpr ast =
             VarName name
 
         FE.Lambda rec ->
-            meExpr rec.body
+            case rec.arguments of
+                [] ->
+                    exprError ast
+
+                [ e1 ] ->
+                    F1 e1 (meExpr rec.body)
+
+                [ e1, e2 ] ->
+                    F2 e1 e2 (meExpr rec.body)
+
+                [ e1, e2, e3 ] ->
+                    F3 e1 e2 e3 (meExpr rec.body)
+
+                _ ->
+                    exprError ast
 
         FE.List items ->
             -- note there's a bug in meta-elm where I don't
@@ -73,15 +81,7 @@ meExpr ast =
             Infix (meExpr a) MeList.cons (meExpr b)
 
         FE.Plus a b ->
-            case ( a, b ) of
-                ( FE.Argument name, _ ) ->
-                    LambdaLeft name MeNumber.plus (meExpr b)
-
-                ( _, FE.Argument name ) ->
-                    LambdaRight (meExpr a) MeNumber.plus name
-
-                _ ->
-                    Infix (meExpr a) MeNumber.plus (meExpr b)
+            Infix (meExpr a) MeNumber.plus (meExpr b)
 
         FE.Int n ->
             n
@@ -174,6 +174,8 @@ view =
     , "(100 + 60 + 2) :: [5, 7+2]"
     , "(\\x -> x + 1)(7)"
     , "(\\z -> 2 + z)(40)"
+
+    {--
     , toCall """
             [ 41, 17, 22, 35, 500 + 7 ]
                 |> List.indexedMap Tuple.pair
@@ -184,6 +186,7 @@ view =
                 |> List.map Tuple.first
                 |> List.map (\\n -> n + 1)
                 """
+    --}
     ]
         |> List.map runExample
         |> List.concat
