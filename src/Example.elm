@@ -4,13 +4,12 @@ import Dict
 import Elm.AST.Frontend as Frontend
 import Elm.AST.Frontend.Unwrapped as FE
 import Elm.Compiler
-import Html
+import Html exposing (Html)
 import Html.Attributes exposing (style)
 import MeList
 import MeNumber
 import MeRepr
 import MeRunTime
-import MeTuple
 import MeType
     exposing
         ( Expr(..)
@@ -19,19 +18,21 @@ import MeType
 import MeWrapper
 
 
-builtins =
-    MeWrapper.allWrappers
+type alias VarInfo =
+    { module_ : Maybe String, name : String }
 
 
+getBuiltin : VarInfo -> Maybe Expr
 getBuiltin var =
     let
         module_ =
             var.module_
                 |> Maybe.withDefault "<unknown>"
     in
-    Dict.get (module_ ++ "." ++ var.name) builtins
+    Dict.get (module_ ++ "." ++ var.name) MeWrapper.allWrappers
 
 
+meExpr : FE.Expr -> MeType.Expr
 meExpr ast =
     case ast of
         FE.Var rec ->
@@ -92,6 +93,7 @@ meExpr ast =
             exprError ast
 
 
+exprError : FE.Expr -> MeType.Expr
 exprError ast =
     let
         _ =
@@ -102,6 +104,7 @@ exprError ast =
         |> SimpleValue
 
 
+runExample : String -> List (Html msg)
 runExample code =
     let
         astResult =
@@ -165,10 +168,12 @@ toCall s =
         |> makeCalls
 
 
+text : String -> Html msg
 text s =
     Html.div [ style "padding" "5px" ] [ Html.pre [] [ Html.text s ] ]
 
 
+view : Html msg
 view =
     [ "17 :: (List.map (\\x -> x + 2) [ 10, 20, 30 ])"
     , "(100 + 60 + 2) :: [5, 7+2]"
