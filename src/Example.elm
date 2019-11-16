@@ -91,6 +91,11 @@ meExpr ast =
                 |> VInt
                 |> SimpleValue
 
+        FE.Float n ->
+            n
+                |> VFloat
+                |> SimpleValue
+
         _ ->
             exprError ast
 
