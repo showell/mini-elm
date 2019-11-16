@@ -15,6 +15,28 @@ indent lst =
 toString : FE.Expr -> String
 toString ast =
     case ast of
+        FE.Let rec ->
+            let
+                bindingToString b =
+                    b.name
+                        ++ "\n"
+                        ++ ([ b.body |> toString
+                            ]
+                                |> indent
+                           )
+
+                bindings =
+                    rec.bindings
+                        |> List.map bindingToString
+                        |> indent
+            in
+            "Let\n"
+                ++ ([ bindings
+                    , rec.body |> toString
+                    ]
+                        |> indent
+                   )
+
         FE.If rec ->
             "If\n"
                 ++ ([ rec.test |> toString

@@ -28,14 +28,18 @@ init _ =
     let
         code =
             """
+let
+    y = 7
+in
 List.tail
     [ 5
+    , y
     , List.map
         (\\x -> x + 3.1)
         (5 :: [(\\x -> x + 1)(8)])
     , 30 + 20 + 10
     , if True then 7 else 13
-    ]"""
+    ]""" |> String.trim
 
         model =
             { title = "simple demo"

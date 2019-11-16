@@ -41,6 +41,21 @@ getBuiltin var =
 meExpr : FE.Expr -> MeType.Expr
 meExpr ast =
     case ast of
+        FE.Let rec ->
+            let
+                bindings =
+                    rec.bindings
+                        |> List.map
+                            (\r ->
+                                ( r.name
+                                , r.body |> meExpr
+                                )
+                            )
+            in
+            LetIn
+                bindings
+                (rec.body |> meExpr)
+
         FE.If rec ->
             IfElse
                 (rec.test |> meExpr)
@@ -53,7 +68,7 @@ meExpr ast =
                     expr
 
                 _ ->
-                    exprError ast
+                    rec.name |> VarName
 
         FE.Call rec ->
             A1
@@ -243,7 +258,7 @@ viewRepl model =
     let
         textAreaAttrs =
             [ style "width" "350px"
-            , style "height" "150px"
+            , style "height" "200px"
             , onInput UpdateInputCode
             ]
 
