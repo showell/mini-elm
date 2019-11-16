@@ -1,9 +1,11 @@
 module Example exposing (view)
 
+import AstHelper
 import Dict
 import Elm.AST.Frontend as Frontend
 import Elm.AST.Frontend.Unwrapped as FE
 import Elm.Compiler
+import Elm.Compiler.Error
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick, onInput)
@@ -104,7 +106,17 @@ exprError ast =
         |> SimpleValue
 
 
-runExample : String -> List (Html msg)
+astToString : Result Elm.Compiler.Error.Error FE.Expr -> String
+astToString astResult =
+    case astResult of
+        Ok ast ->
+            ast
+                |> AstHelper.toString
+
+        _ ->
+            "cannot compile"
+
+
 runExample code =
     let
         astResult =
@@ -132,7 +144,8 @@ runExample code =
                 |> MeRepr.fromExpr
 
         elmInElmSide =
-            Debug.toString astResult
+            astResult
+                |> astToString
 
         metaElmSide =
             Debug.toString expr
@@ -198,9 +211,10 @@ evaluate code =
         computedExpr =
             expr
                 |> MeRunTime.computeExpr
+                |> MeRepr.fromExpr
+                |> String.replace "\n" ""
     in
-    computedExpr
-        |> MeRepr.fromExpr
+    computedExpr ++ "\n\n\n" ++ (astResult |> astToString)
 
 
 divify : Html Msg -> Html Msg
@@ -228,11 +242,17 @@ viewRepl model =
                 |> List.singleton
                 |> Html.p [ style "width" "350px" ]
 
+        showResult s =
+            s
+                |> List.singleton
+                |> Html.pre []
+                |> divify
+
         inputArea =
             [ introText
             , Html.textarea textAreaAttrs [ Html.text model.inputCode ]
             , Html.button [ onClick Compile ] [ Html.text "compile" ] |> divify
-            , Html.text (evaluate model.code) |> divify
+            , Html.text (evaluate model.code) |> showResult
             ]
                 |> div [ style "padding" "50px" ]
     in
