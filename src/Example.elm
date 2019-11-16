@@ -138,6 +138,10 @@ exprError ast =
         |> SimpleValue
 
 
+evalAstInJS ast =
+    "REPLACE_CODE_HERE"
+
+
 astToString : Result Elm.Compiler.Error.Error FE.Expr -> String
 astToString astResult =
     case astResult of
@@ -246,7 +250,12 @@ evaluate code =
                 |> MeRepr.fromExpr
                 |> String.replace "\n" ""
     in
-    computedExpr ++ "\n\n\n" ++ (astResult |> astToString)
+    "USING meta-elm:\n"
+        ++ computedExpr
+        ++ "\n\nUSING eval.js:\n"
+        ++ (astResult |> evalAstInJS)
+        ++ "\n\n\n"
+        ++ (astResult |> astToString)
 
 
 divify : Html Msg -> Html Msg
@@ -273,7 +282,7 @@ viewRepl model =
     let
         textAreaAttrs =
             [ style "width" "350px"
-            , style "height" "200px"
+            , style "height" "280px"
             , onInput UpdateInputCode
             ]
 
@@ -294,13 +303,25 @@ viewRepl model =
             , Html.button [ onClick Compile ] [ Html.text "compile" ] |> divify
             , Html.Lazy.lazy evaluationResult model.code
             ]
-                |> div [ style "padding" "50px" ]
+                |> div [ style "padding" "20px" ]
     in
     inputArea
 
 
+bringInBuiltins =
+    let
+        sort =
+            List.sort [ 1, 2, 3 ]
+    in
+    ()
+
+
 view : Model -> List (Html Msg)
 view model =
+    let
+        _ =
+            bringInBuiltins
+    in
     [ viewRepl model
     , Html.hr [] []
     , Html.h3 [] [ Html.text "supported methods" ]
@@ -317,6 +338,7 @@ viewExample =
     , "(100 + 60 + 2) :: [5, 7+2]"
     , "(\\x -> x + 1)(7)"
     , "(\\z -> 2 + z)(40)"
+    , "(\\x -> x + x + 3) 100"
 
     {--
     , toCall """

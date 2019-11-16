@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Builtin
 import Example
 import Type
     exposing
@@ -26,6 +27,9 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
+        hacks =
+            Builtin.hacks
+
         code =
             """
 let
@@ -35,6 +39,7 @@ List.tail
     [ 5
     , y
     , False
+    , Tuple.pair 10 20
     , List.map
         (\\x -> x + 3.1)
         (5 :: [(\\x -> x + 1)(8)])
