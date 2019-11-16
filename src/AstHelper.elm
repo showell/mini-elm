@@ -15,6 +15,15 @@ indent lst =
 toString : FE.Expr -> String
 toString ast =
     case ast of
+        FE.If rec ->
+            "If\n"
+                ++ ([ rec.test |> toString
+                    , rec.test |> toString
+                    , rec.else_ |> toString
+                    ]
+                        |> indent
+                   )
+
         FE.Var var ->
             case var.module_ of
                 Just mname ->
@@ -68,6 +77,18 @@ toString ast =
 
         FE.Int n ->
             "Int: " ++ (n |> String.fromInt)
+
+        FE.Float n ->
+            "Float: " ++ (n |> String.fromFloat)
+
+        FE.Bool b ->
+            "Float: "
+                ++ (if b then
+                        "True"
+
+                    else
+                        "False"
+                   )
 
         _ ->
             "???"
