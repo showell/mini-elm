@@ -40,7 +40,7 @@ toString ast =
         FE.If rec ->
             "If\n"
                 ++ ([ rec.test |> toString
-                    , rec.test |> toString
+                    , rec.then_ |> toString
                     , rec.else_ |> toString
                     ]
                         |> indent
@@ -104,7 +104,7 @@ toString ast =
             "Float: " ++ (n |> String.fromFloat)
 
         FE.Bool b ->
-            "Float: "
+            "Bool: "
                 ++ (if b then
                         "True"
 

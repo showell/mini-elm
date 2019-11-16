@@ -34,6 +34,7 @@ in
 List.tail
     [ 5
     , y
+    , False
     , List.map
         (\\x -> x + 3.1)
         (5 :: [(\\x -> x + 1)(8)])
