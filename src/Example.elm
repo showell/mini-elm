@@ -41,6 +41,12 @@ getBuiltin var =
 meExpr : FE.Expr -> MeType.Expr
 meExpr ast =
     case ast of
+        FE.If rec ->
+            IfElse
+                (rec.test |> meExpr)
+                (rec.then_ |> meExpr)
+                (rec.else_ |> meExpr)
+
         FE.Var rec ->
             case getBuiltin rec of
                 Just expr ->
@@ -89,6 +95,11 @@ meExpr ast =
         FE.Int n ->
             n
                 |> VInt
+                |> SimpleValue
+
+        FE.Bool n ->
+            n
+                |> VBool
                 |> SimpleValue
 
         FE.Float n ->

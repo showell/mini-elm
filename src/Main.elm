@@ -33,7 +33,9 @@ List.tail
     , List.map
         (\\x -> x + 3.1)
         (5 :: [(\\x -> x + 1)(8)])
-    , 30 + 20 + 10]"""
+    , 30 + 20 + 10
+    , if True then 7 else 13
+    ]"""
 
         model =
             { title = "simple demo"
