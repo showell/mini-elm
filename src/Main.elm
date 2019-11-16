@@ -28,12 +28,12 @@ init _ =
     let
         code =
             """
-List.take 2
+List.tail
     [ 5
     , List.map
         (\\x -> x + 3)
         (5 :: [(\\x -> x + 1)(8)])
-    , 3]"""
+    , 30 + 20 + 10]"""
 
         model =
             { title = "simple demo"

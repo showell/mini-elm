@@ -73,12 +73,8 @@ meExpr ast =
                     exprError ast
 
         FE.List items ->
-            -- note there's a bug in meta-elm where I don't
-            -- compute lists aggressively enough, so we do
-            -- computeExpr below
             items
                 |> List.map meExpr
-                |> List.map MeRunTime.computeExpr
                 |> VList
                 |> SimpleValue
 
