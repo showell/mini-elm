@@ -9,6 +9,7 @@ import Elm.Compiler.Error
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick, onInput)
+import Html.Lazy
 import MeList
 import MeNumber
 import MeRepr
@@ -253,6 +254,20 @@ divify html =
     html |> List.singleton |> div [ style "padding" "5px" ]
 
 
+showResult : Html Msg -> Html Msg
+showResult s =
+    s
+        |> List.singleton
+        |> Html.pre []
+        |> divify
+
+
+evaluationResult : String -> Html Msg
+evaluationResult code =
+    -- this can be expensive, memoize it!
+    Html.text (evaluate code) |> showResult
+
+
 viewRepl : Model -> Html Msg
 viewRepl model =
     let
@@ -273,17 +288,11 @@ viewRepl model =
                 |> List.singleton
                 |> Html.p [ style "width" "350px" ]
 
-        showResult s =
-            s
-                |> List.singleton
-                |> Html.pre []
-                |> divify
-
         inputArea =
             [ introText
             , Html.textarea textAreaAttrs [ Html.text model.inputCode ]
             , Html.button [ onClick Compile ] [ Html.text "compile" ] |> divify
-            , Html.text (evaluate model.code) |> showResult
+            , Html.Lazy.lazy evaluationResult model.code
             ]
                 |> div [ style "padding" "50px" ]
     in
