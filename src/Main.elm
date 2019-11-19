@@ -39,6 +39,7 @@ List.tail
     [ 5
     , y
     , False
+    , (\\a b c -> a + b + c + y) 300 20 1
     , Tuple.pair 10 20
     , List.map
         (\\x -> x + 3.1)

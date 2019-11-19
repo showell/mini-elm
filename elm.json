@@ -11,7 +11,7 @@
             "elm/html": "1.0.0",
             "elm/parser": "1.1.0",
             "elm-in-elm/compiler": "1.0.1",
-            "showell/meta-elm": "3.0.0"
+            "showell/meta-elm": "4.0.1"
         },
         "indirect": {
             "Chadtech/elm-bool-extra": "2.4.0",

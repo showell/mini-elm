@@ -27,8 +27,9 @@ return (function () {
             }
         }
 
+        console.log("bad context?", c, name);
         return function() {
-            return "cannot find List function: " + name;
+            return "cannot find function: " + name;
         }
     }
 
@@ -39,6 +40,7 @@ return (function () {
 
         switch (expr.$) {
             case 'Call':
+                console.info('incoming context for Call', c);
                 var rec = expr.a;
                 var f = e(rec.fn);
 
@@ -68,6 +70,7 @@ return (function () {
 
             case 'Lambda':
                 function lambda(context, params, body) {
+                    console.info('incoming context for Lambda', context);
                     return function (arg) {
                         var newContext = [
                             { name: params[0], val: arg }
@@ -85,7 +88,7 @@ return (function () {
                 }
                 var rec = expr.a;
                 var initParams = _List_toArray(rec._arguments);
-                return lambda([], initParams, rec.body);
+                return lambda(c, initParams, rec.body);
 
             case 'If':
                 var rec = expr.a;
@@ -134,9 +137,7 @@ return (function () {
     }
 
     function result(expr) {
-        let context = [
-            { name: 'n', val: 55 }
-        ];
+        let context = [];
         if (expr.$ === 'Ok') {
             return ev(context, expr.a);
         } else {
