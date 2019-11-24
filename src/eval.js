@@ -1,4 +1,6 @@
 return (function () {
+    var numOperations = 0;
+
     function truthy(expr) {
         return expr.a;
     }
@@ -34,6 +36,13 @@ return (function () {
     }
 
     function ev(c, expr) {
+        numOperations += 1;
+
+        if (numOperations > 10000) {
+            console.info("TOO MANY OPERATIONS! infinite recursion?");
+            return "infinite recursion?";
+        }
+
         function e(expr) {
             return ev(c, expr);
         }
@@ -137,7 +146,9 @@ return (function () {
     function result(expr) {
         let context = [];
         if (expr.$ === 'Ok') {
-            return ev(context, expr.a);
+            let val = ev(context, expr.a);
+            console.info('numOperations', numOperations);
+            return val;
         } else {
             return 'error';
         }
