@@ -1,3 +1,17 @@
+/*
+ * This is an experimental eval() loop for the elm-in-elm compiler.
+ * It's running against an early version of elm-in-elm, so it only
+ * handles the elm-in-elm constructs that were available in November 2019.
+ *
+ * It's almost certainly buggy, but it does handle some stuff pretty well.
+ * You can try it out by following instructions in the README.
+ *
+ * It tries to stop runaway programs by counting numOperations.
+ *
+ * It also lets you call some standard library functions (such as all of
+ * List.elm).  Those count as one operation each, so we can't detect
+ * situations where library calls infinitely recurse.
+ */
 return (function () {
     var numOperations = 0;
 
