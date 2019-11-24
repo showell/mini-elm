@@ -17,7 +17,7 @@ In order for `eval.js` to do its thing, we have to hack the
 Elm compiler's output.  Instructions:
 
    <pre>
-   elm make src/Make.elm
+   elm make src/Main.elm
    python postprocess.py
    (run index2.html in browser)
    </pre>
