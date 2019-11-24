@@ -40,7 +40,6 @@ return (function () {
 
         switch (expr.$) {
             case 'Call':
-                console.info('incoming context for Call', c);
                 var rec = expr.a;
                 var f = e(rec.fn);
 
@@ -70,7 +69,6 @@ return (function () {
 
             case 'Lambda':
                 function lambda(context, params, body) {
-                    console.info('incoming context for Lambda', context);
                     return function (arg) {
                         var newContext = [
                             { name: params[0], val: arg }
