@@ -233,29 +233,44 @@ evaluate code =
                 |> Elm.Compiler.parseExpr
                 |> Result.map Frontend.unwrap
 
-        expr =
-            case astResult of
-                Ok ast ->
-                    ast
-                        |> meExpr
-
-                Err _ ->
-                    "cannot compile"
-                        |> VError
-                        |> ComputedValue
-
-        computedExpr =
-            expr
-                |> MeRunTime.computeExpr
-                |> MeRepr.fromExpr
-                |> String.replace "\n" ""
+        resultFromJs =
+            astResult
+                |> evalAstInJS
     in
-    "USING meta-elm:\n"
-        ++ computedExpr
-        ++ "\n\nUSING eval.js:\n"
-        ++ (astResult |> evalAstInJS)
-        ++ "\n\n\n"
-        ++ (astResult |> astToString)
+    if resultFromJs == "REPLACE" ++ "_CODE_HERE" then
+        """
+        WARNING!!!!
+
+        You should run postprocess.py to create
+        index2.html, which does a JS eval of
+        the AST
+        """
+
+    else
+        let
+            expr =
+                case astResult of
+                    Ok ast ->
+                        ast
+                            |> meExpr
+
+                    Err _ ->
+                        "cannot compile"
+                            |> VError
+                            |> ComputedValue
+
+            computedExpr =
+                expr
+                    |> MeRunTime.computeExpr
+                    |> MeRepr.fromExpr
+                    |> String.replace "\n" ""
+        in
+        "USING meta-elm:\n"
+            ++ computedExpr
+            ++ "\n\nUSING eval.js:\n"
+            ++ resultFromJs
+            ++ "\n\n\n"
+            ++ (astResult |> astToString)
 
 
 divify : Html Msg -> Html Msg
